@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test WebSockets</title>
+</head>
+<body>
+<h1>Test WebSockets</h1>
+<div id="output"></div>
+<div id="word1"></div>
+<div id="word2"></div>
+<button id="getWordsButton">Get Pair of Words</button>
+
+<script>
+  const getPairOfWords = () => {
+    fetch('/words')
+            .then(response => response.text())
+            .then(pairOfWords => {
+              const [word1, word2] = pairOfWords.split('/');
+              document.getElementById('word1').innerText = word1;
+              document.getElementById('word2').innerText = word2;
+            });
+  };
+
+  document.getElementById('getWordsButton').addEventListener('click', getPairOfWords);
+</script>
+
+<script>
+  const ws = new WebSocket('ws://localhost:8080/my-websocket-endpoint');
+
+  ws.onopen = () => {
+    console.log('WebSocket connection established.');
+  };
+
+  ws.onmessage = (event) => {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML += event.data + '<br>';
+  };
+
+  ws.onclose = () => {
+    console.log('WebSocket connection closed.');
+  };
+
+  const button = document.createElement('button');
+  button.innerHTML = 'Send WebSocket message';
+  button.addEventListener('click', () => {
+    ws.send('Hello, server!');
+  });
+  document.body.appendChild(button);
+</script>
+</body>
+</html>
